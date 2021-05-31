@@ -1,0 +1,12 @@
+John is a zombie
+summon
+	task Greet
+		say "Hi\n"
+	animate
+	task Name
+		say "John\n"
+	animate
+	task Task3
+		say "This is a task\n"
+	animate
+bind
