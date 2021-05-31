@@ -1,5 +1,6 @@
 use crate::entities::Entity;
 
+#[derive(Debug, Copy, Clone)]
 pub struct Zombie<'a> {
     name: &'a str
 }
@@ -11,9 +12,9 @@ impl<'a> Zombie<'a> {
 }
 
 impl<'a> Entity for Zombie<'a> {
-    fn name(&self) -> &'a str {
-        self.name
-    }
+    fn name(&self) -> &'a str { self.name }
+
+    fn entity_type(&self) -> &'a str { "zombie" }
 
     fn is_active(&self) -> bool {
         todo!()
