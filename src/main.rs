@@ -8,7 +8,7 @@ use utilities::read_lines;
 fn main() -> std::io::Result<()> {
     let args = std::env::args().collect::<Vec<String>>();
 
-    let mut filename = "./tests/test.zombie";
+    let mut filename = "./tests/hello_world.zombie";
 
     if args.len() > 1 && std::path::Path::new(&args[1]).exists() {
         filename = &args[1];

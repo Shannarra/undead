@@ -1,21 +1,27 @@
-Josh is a zombie
+Josh is a Zombie
 summon
-    John is a zombie
-    summon
-    bind
+
 	task Greet
 		say "Hi\n"
-		Pete is a zombie
-        summon
-        bind
+
 	animate
 	task Name
 		say "John\n"
 	animate
 	task Task3
 		say "This is a task\n"
-		Petar is a zombie
-		summon
-		bind
+
 	animate
+bind
+
+John is a Zombie
+summon
+bind
+
+Pete is a Zombie
+summon
+bind
+
+Petar is a Zombie
+summon
 bind
