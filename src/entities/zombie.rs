@@ -1,6 +1,7 @@
 use crate::entities::Entity;
+use std::fmt::Display;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct Zombie<'a> {
     name: &'a str
 }
@@ -21,7 +22,7 @@ impl<'a> Entity for Zombie<'a> {
     }
 
     fn tasks_count(&self) -> i32 {
-        todo!()
+        0
     }
 
     fn perform_tasks(&self) {
@@ -30,5 +31,20 @@ impl<'a> Entity for Zombie<'a> {
         } else {
             panic!("No tasks for current Zombie named \"{}\"", self.name);
         }
+    }
+
+    fn print_entity_data(&self) {
+        println!("{}", &self);
+    }
+}
+
+impl std::fmt::Display for Zombie<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "This is a {} with the name {}. {} has {} tasks before disappearing again.",
+               "zombie",
+                &self.name,
+                &self.name,
+                &self.tasks_count()
+        )
     }
 }

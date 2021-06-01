@@ -1,5 +1,7 @@
 John is a zombie
 summon
+Josh is a zombie
+summon
 	task Greet
 		say "Hi\n"
 	animate
