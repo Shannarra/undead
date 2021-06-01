@@ -18,9 +18,7 @@ fn main() -> std::io::Result<()> {
         let mut zombie_code = String::new();
         for line in text {
             let line = &line?;
-            if !line.is_empty() {
-                zombie_code += &("\n".to_string() + line.trim());
-            }
+            zombie_code += &("\n".to_string() + line.trim());
         }
 
         generator::generate_all(&zombie_code);

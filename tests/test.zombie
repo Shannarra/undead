@@ -3,11 +3,9 @@ summon
     John is a zombie
     summon
     bind
-
 	task Greet
 		say "Hi\n"
 		Pete is a zombie
-
         summon
         bind
 	animate
@@ -16,5 +14,8 @@ summon
 	animate
 	task Task3
 		say "This is a task\n"
+		Petar is a zombie
+		summon
+		bind
 	animate
 bind

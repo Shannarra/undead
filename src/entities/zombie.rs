@@ -4,7 +4,7 @@ use std::fmt::Display;
 #[derive(Copy, Clone)]
 pub struct Zombie<'a> {
     pub name: &'a str,
-    scope: Option<(u32, u32)>
+    scope: Option<(usize, usize)>
 }
 
 impl<'a> Zombie<'a> {
@@ -12,7 +12,7 @@ impl<'a> Zombie<'a> {
         Self {name, scope: None }
     }
 
-    pub fn with_scope(name: &'a str, scope: Option<(u32, u32)>) -> Self {
+    pub fn with_scope(name: &'a str, scope: Option<(usize, usize)>) -> Self {
         Self {name, scope}
     }
 
@@ -49,9 +49,7 @@ impl<'a> Entity for Zombie<'a> {
         println!("{}", &self);
     }
 
-    fn entity_scope(&self) -> Option<(u32, u32)> { self.scope }
-
-
+    fn entity_scope(&self) -> Option<(usize, usize)> { self.scope }
 }
 
 impl std::fmt::Display for Zombie<'_> {

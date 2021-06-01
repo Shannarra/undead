@@ -17,7 +17,7 @@ pub trait Entity {
     /*dev ops*/
 
     fn print_entity_data(&self);
-    fn entity_scope(&self) -> Option<(u32, u32)>;
+    fn entity_scope(&self) -> Option<(usize, usize)>;
 }
 
 /// A necromancer is what executes
