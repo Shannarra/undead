@@ -13,7 +13,11 @@ pub trait Entity {
     fn is_active(&self) -> bool;
     fn tasks_count(&self) -> i32;
     fn perform_tasks(&self);
+
+    /*dev ops*/
+
     fn print_entity_data(&self);
+    fn entity_scope(&self) -> Option<(u32, u32)>;
 }
 
 /// A necromancer is what executes

@@ -17,8 +17,10 @@ fn main() -> std::io::Result<()> {
     if let Ok(text) = read_lines(filename) {
         let mut zombie_code = String::new();
         for line in text {
-            zombie_code += &("\n".to_string()
-                + &line?.replace("\t", ""));
+            let line = &line?;
+            if !line.is_empty() {
+                zombie_code += &("\n".to_string() + line.trim());
+            }
         }
 
         generator::generate_all(&zombie_code);

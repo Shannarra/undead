@@ -7,7 +7,15 @@ use std::ops::Deref;
 
 //#[allow(unused_variables)]
 pub fn generate_all(zombie_code: &String) {
+
+    if zombie_code.matches("summon").count() != zombie_code.matches("bind").count() {
+        panic!("All summoned entities must be bound after execution!");
+    }
+
+    println!("{}", zombie_code);
+
     let depth :u32 = 0;
+    let mut summons :u32 = 0;
     let mut next_summon = false;
     let mut entity: Option<Box<dyn Entity>> = None; //Box::<dyn Entity>::new();
 
@@ -34,6 +42,7 @@ pub fn generate_all(zombie_code: &String) {
                 panic!("Expected \"summon\" after entity definition on line {}. \
                 \nHint: use \"summon\" on line {} instead of \"{}\"", line - 1, line, lines[line]);
             }
+            summons += 1;
 
             // if the entity has been summoned then print it out
             if let Some(e) = &entity {

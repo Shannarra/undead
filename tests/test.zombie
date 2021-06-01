@@ -1,9 +1,15 @@
-John is a zombie
-summon
 Josh is a zombie
 summon
+    John is a zombie
+    summon
+    bind
+
 	task Greet
 		say "Hi\n"
+		Pete is a zombie
+
+        summon
+        bind
 	animate
 	task Name
 		say "John\n"
