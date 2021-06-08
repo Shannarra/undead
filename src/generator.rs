@@ -1,8 +1,10 @@
 use crate::entities::{
     self,
     Entity,
+    Task,
     Zombie
 };
+use std::collections::VecDeque;
 
 pub fn generate_all(zombie_code: &String) {
 
@@ -53,12 +55,23 @@ pub fn generate_all(zombie_code: &String) {
                 }
 
                 // if the entity has been summoned then print it out
-                if let Some(e) = &entity {
+                if let Some(e) = &mut entity {
+                    e.set_tasks(generate_tasks());
+                    e.perform_tasks();
                     e.print_entity_data();
                 }
             }
         }
     }
+}
+
+fn generate_tasks() -> VecDeque<Task> {
+    let task = Task::new("".to_string(), true);
+    let mut q = VecDeque::new();
+
+    q.push_back(task);
+
+    q
 }
 
 fn scope_check(code: &String) -> Option<Vec<&str>> {

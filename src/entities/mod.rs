@@ -1,8 +1,9 @@
-pub mod zombie;
+mod zombie;
 mod task;
 
-use task::Task;
-pub use zombie::Zombie;
+pub(crate) use zombie::Zombie;
+pub(crate) use task::Task;
+use std::collections::VecDeque;
 
 /// A trait representing what
 /// an Entity means in the Zombie
@@ -11,8 +12,9 @@ pub trait Entity {
     fn name(&self) -> &str;
     fn entity_type(&self) -> &str;
     fn is_active(&self) -> bool;
-    fn tasks_count(&self) -> i32;
-    fn perform_tasks(&self);
+    fn tasks_count(&self) -> usize;
+    fn perform_tasks(&mut self);
+    fn set_tasks(&mut self, _: VecDeque<Task>);
 
     /*dev ops*/
 
