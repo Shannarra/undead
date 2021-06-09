@@ -79,7 +79,7 @@ fn generate_tasks(range: &(usize, usize), text: &Vec<&str>) -> VecDeque<Task> {
             q.push_back(task);
             current_task_code = vec![];
         } else {
-            current_task_code.push(task_line.to_string() + "\n");
+            current_task_code.push(task_line.to_string());
         }
     }
 

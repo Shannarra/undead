@@ -7,10 +7,10 @@ summon
 		say "John\n"
 	animate
 	task Task3
-		say "This is a task\n"
+		say "This is  \"asdsa\" a task\n"
 	animate
 	task taskname
-	    say "AAA"
+	    say "AAA\n"
 	animate
 bind
 
