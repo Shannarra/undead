@@ -15,6 +15,7 @@ pub fn generate_all(zombie_code: &String) {
         let mut bounds: Vec<usize> = Vec::new();
         let mut next_summon = false;
         let mut entity: Option<Box<dyn Entity>> = None; //Box::<dyn Entity>::new();
+        let mut entity_bounds: (usize, usize) = (0,0);
 
         //let lines: Vec<&str> = zombie_code.split("\n").collect::<Vec<&str>>();
 
@@ -34,9 +35,10 @@ pub fn generate_all(zombie_code: &String) {
                 // but the interpreter will panic! at the next line and dispose of it.
 
                 if contents[contents.len() - 1] == "Zombie" {
+                    entity_bounds = (line, bounds.pop().unwrap());
                     entity = Some(Box::new(
                         Zombie::with_scope(&contents[0],
-                                           Some((line, bounds.pop().unwrap())))
+                                           Some(entity_bounds))
                     ));
                     next_summon = true;
                     entities_list.push(contents[0].to_string());
@@ -56,7 +58,7 @@ pub fn generate_all(zombie_code: &String) {
 
                 // if the entity has been summoned then print it out
                 if let Some(e) = &mut entity {
-                    e.set_tasks(generate_tasks());
+                    e.set_tasks(generate_tasks(&entity_bounds, &lines));
                     e.perform_tasks();
                     e.print_entity_data();
                 }
@@ -65,11 +67,21 @@ pub fn generate_all(zombie_code: &String) {
     }
 }
 
-fn generate_tasks() -> VecDeque<Task> {
-    let task = Task::new("".to_string(), true);
-    let mut q = VecDeque::new();
+fn generate_tasks(range: &(usize, usize), text: &Vec<&str>) -> VecDeque<Task> {
+    let mut task:Task;
+    let mut current_task_code :Vec<String> = vec![];
 
-    q.push_back(task);
+    let mut q: VecDeque<Task> = VecDeque::new();
+
+    for task_line in text[(range.0 + 2)..(range.1)].iter() {
+        if task_line.starts_with("animate") {
+            task = Task::new(current_task_code, true);
+            q.push_back(task);
+            current_task_code = vec![];
+        } else {
+            current_task_code.push(task_line.to_string() + "\n");
+        }
+    }
 
     q
 }

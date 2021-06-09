@@ -40,12 +40,12 @@ impl Necromancer {
     }
 
     pub fn execute_task(&self, task_nr: i32) {
-        let text = &self.tasks[task_nr as usize].exec_code.split("\n").collect::<Vec<&str>>();
+        //let text = &self.tasks[task_nr as usize].exec_code.split("\n").collect::<Vec<&str>>();
 
-        for mut task_arg in text {
-            if task_arg.starts_with("null") {
-                task_arg = &&*task_arg.replace("null", "")
-            }
-        }
+        //for mut task_arg in text {
+        //    if task_arg.starts_with("null") {
+        //        task_arg = &&*task_arg.replace("null", "")
+        //    }
+        //}
     }
 }

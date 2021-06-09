@@ -24,11 +24,6 @@ impl<'a> Zombie<'a> {
         }
         String::from("")
     }
-
-    fn execute_task(&self, task: &Task) -> bool {
-        println!("Task code: {}", task.exec_code);
-        return true
-    }
 }
 
 impl<'a> Entity for Zombie<'a> {
@@ -51,8 +46,8 @@ impl<'a> Entity for Zombie<'a> {
         if self.tasks_count() >= 1 {
             if let Some(queue) = &self.tasks {
                 for task in queue {
-                    if !self.execute_task(task) {
-                        panic!("{} named \"{}\" could not execute task with code: {}", &self.entity_type(), &self.name, task.exec_code)
+                    if !task.execute() {
+                        panic!("{} named \"{}\" could not execute task with code: {:?}", &self.entity_type(), &self.name, task.exec_code)
                     }
                 }
                 self.tasks.as_mut().unwrap().clear();
