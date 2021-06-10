@@ -2,15 +2,26 @@ Josh is a Zombie
 summon
 	task Greet
 		say "Hi\n"
-	animate
+	done
 	task Name
-		say "John\n"
-	animate
+		say "I am Josh\n"
+	done
 	task Task3
 		say "This is  \"asdsa\" a task\n"
-	animate
+	done
 	task taskname
 	    say "AAA\n"
-	animate
+	done
 bind
 
+Pete is a Zombie
+summon
+    task RunJosh
+        animate Josh
+    done
+bind
+
+animate Pete
+read_about Pete
+banish Pete
+read_about Pete //no entity with this name was found

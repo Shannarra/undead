@@ -4,17 +4,24 @@ use crate::entities::{
     Task,
     Zombie
 };
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashMap};
+use std::borrow::BorrowMut;
+
 
 pub fn generate_all(zombie_code: &String) {
+
+    let mut all_entities :HashMap<&str, Box<dyn Entity>> = HashMap::new();
 
     if let Some(lines) = scope_check(&zombie_code) {
         let depth: u32 = 0;
 
-        let mut entities_list: Vec<String> = Vec::new();
+        //let mut entities_list: Vec<String> = Vec::new();
         let mut bounds: Vec<usize> = Vec::new();
         let mut next_summon = false;
-        let mut entity: Option<Box<dyn Entity>> = None; //Box::<dyn Entity>::new();
+
+        //TODO: change box to something mutable
+        //let mut entity: Option<Box<dyn Entity>> = None; //Box::<dyn Entity>::new();
+        let mut current_entity_info :(&str, &str) = ("", "");
         let mut entity_bounds: (usize, usize) = (0,0);
 
         //let lines: Vec<&str> = zombie_code.split("\n").collect::<Vec<&str>>();
@@ -26,8 +33,19 @@ pub fn generate_all(zombie_code: &String) {
                 let contents = lines[line].split(" ").collect::<Vec<&str>>();
 
                 // Entities' names MUST be unique
-                if entities_list.contains(&contents[0].to_string()) {
-                    panic!("Entity with name \"{}\" already declared.", &contents[0]);
+                //if entities_list.contains(&contents[0].to_string()) {
+                //
+                //}
+
+                for entity in &all_entities {
+                    // collision. Entity with that name and type already exists.
+                    if &entity.1.name() == &contents[0] &&
+                        &entity.1.entity_type() == &contents[&contents.len() - 1].to_lowercase()
+                    {
+                        let scope = entity.1.entity_scope().unwrap();
+                        panic!("Entity with name \"{}\" of type \"{}\" has been already declared in the scope: [{}, {}].",
+                               &contents[0], &contents[&contents.len() - 1], scope.0, scope.1);
+                    }
                 }
 
                 // Entity creation is coupled with it's definition.
@@ -36,12 +54,16 @@ pub fn generate_all(zombie_code: &String) {
 
                 if contents[contents.len() - 1] == "Zombie" {
                     entity_bounds = (line, bounds.pop().unwrap());
-                    entity = Some(Box::new(
+
+                    current_entity_info = (contents[contents.len() - 1], &contents[0]);
+
+                    all_entities.insert(&contents[0], Box::new(
                         Zombie::with_scope(&contents[0],
                                            Some(entity_bounds))
                     ));
+
                     next_summon = true;
-                    entities_list.push(contents[0].to_string());
+                    //entities_list.push(contents[0].to_string());
                 }
                 // TODO: all other entities - ghost, vampire, demon, djinn
 
@@ -56,11 +78,46 @@ pub fn generate_all(zombie_code: &String) {
                 \nHint: use \"summon\" on line {} instead of \"{}\"", line - 1, line, lines[line]);
                 }
 
-                // if the entity has been summoned then print it out
-                if let Some(e) = &mut entity {
-                    e.set_tasks(generate_tasks(&entity_bounds, &lines));
-                    e.perform_tasks();
-                    e.print_entity_data();
+                if let Some(entity) = all_entities.get_mut(current_entity_info.1) {
+                    entity.set_tasks(generate_tasks(&entity_bounds, &lines));
+                }
+            }
+
+            if lines[line].starts_with("animate") || lines[line].starts_with("read_about") {
+                let contents = lines[line].split(" ").collect::<Vec<&str>>();
+
+                //TODO: DRY this check
+                if contents.len() > 2 {
+                    panic!("Animation expects only one argument.");
+                } else if contents.len() < 2 {
+                    panic!("Animation requires an Entity's name.");
+                }
+                if let Some(entity) = all_entities.get_mut(contents[1]) {
+                    if lines[line].starts_with("animate") {
+                        entity.perform_tasks();
+                        entity.toggle_active();
+                    } else if lines[line].starts_with("read_about") {
+                        entity.print_entity_data();
+                    }
+                } else {
+                    panic!("No entity to with name \"{}\" was found.", contents[1]);
+                }
+            }
+
+            if lines[line].starts_with("banish") {
+                let contents = lines[line].split(" ").collect::<Vec<&str>>();
+
+                //TODO: DRY
+                if contents.len() > 2 {
+                    panic!("Animation expects only one argument.");
+                } else if contents.len() < 2 {
+                    panic!("Animation requires an Entity's name.");
+                }
+
+                if let Some(entity) = all_entities.get(contents[1]) {
+                    all_entities.remove(contents[1]);
+                } else {
+                    panic!("No entity to banish with name \"{}\" was found.", contents[1]);
                 }
             }
         }
@@ -74,7 +131,7 @@ fn generate_tasks(range: &(usize, usize), text: &Vec<&str>) -> VecDeque<Task> {
     let mut q: VecDeque<Task> = VecDeque::new();
 
     for task_line in text[(range.0 + 2)..(range.1)].iter() {
-        if task_line.starts_with("animate") {
+        if task_line.starts_with("done") {
             task = Task::new(current_task_code, true);
             q.push_back(task);
             current_task_code = vec![];
@@ -104,7 +161,7 @@ fn scope_check(code: &String) -> Option<Vec<&str>> {
                 summons_and_tasks += 1;
             }
         }
-        if line.contains("animate") || line.contains("bind") {
+        if line.contains("done") || line.contains("bind") {
             if line.starts_with("say") || line.contains("\""){
                 continue;
             } else {
@@ -114,8 +171,8 @@ fn scope_check(code: &String) -> Option<Vec<&str>> {
     }
 
     if animations_and_bounds != summons_and_tasks {
-        panic!("Unbalanced summons/tasks with corresponding binds/animations. \
-        Please use \"bind\" or \"animate\" when any entity or task are summoned.")
+        panic!("Unbalanced summons/tasks with corresponding bind/done directives. \
+        Please use \"bind\" or \"done\" when any entity or task are summoned.")
     }
 
 

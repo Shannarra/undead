@@ -15,12 +15,14 @@ pub trait Entity {
     fn tasks_count(&self) -> usize;
     fn perform_tasks(&mut self);
     fn set_tasks(&mut self, _: VecDeque<Task>);
+    fn toggle_active(&mut self);
 
     /*dev ops*/
 
     fn print_entity_data(&self);
     fn entity_scope(&self) -> Option<(usize, usize)>;
 }
+
 
 /// A necromancer is what executes
 /// an `Entity`'s tasks
