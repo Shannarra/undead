@@ -73,6 +73,16 @@ impl<'a> Entity for Zombie<'a> {
         self.active = !self.active;
     }
 
+    fn is_line_within_scope(&self, line: usize) -> bool {
+        if let Some(scope) = self.scope {
+            if line < scope.0 && line > scope.1 {
+                return false
+            }
+            return true
+        }
+        false
+    }
+
     fn print_entity_data(&self) { println!("{}", &self); }
 
     fn entity_scope(&self) -> Option<(usize, usize)> { self.scope }

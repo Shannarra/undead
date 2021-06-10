@@ -12,16 +12,30 @@ summon
 	task taskname
 	    say "AAA\n"
 	done
+
 bind
 
 Pete is a Zombie
 summon
+
+    //use Pete //Error: Attempted top-level execution within entity/task bounds.
+
     task RunJosh
-        animate Josh
+        say "Run, Josh, ruuuun \n"
+    done
+
+    task Greet
+        say "And this is Pete\n"
     done
 bind
 
-animate Pete
-read_about Pete
-banish Pete
-read_about Pete //no entity with this name was found
+use Pete
+
+// same as writing "use Josh"
+animate Josh
+banish Josh
+
+//animate Pete
+//read_about Pete
+//banish Pete
+//read_about Pete //Err: No entity to with name "Pete" was found.

@@ -5,8 +5,6 @@ use crate::entities::{
     Zombie
 };
 use std::collections::{VecDeque, HashMap};
-use std::borrow::BorrowMut;
-
 
 pub fn generate_all(zombie_code: &String) {
 
@@ -24,18 +22,23 @@ pub fn generate_all(zombie_code: &String) {
         let mut current_entity_info :(&str, &str) = ("", "");
         let mut entity_bounds: (usize, usize) = (0,0);
 
+        let mut all_entity_bounds :Vec<(usize, usize)> = vec![];
+
         //let lines: Vec<&str> = zombie_code.split("\n").collect::<Vec<&str>>();
 
         set_entities_bounds(&lines, &mut bounds);
 
         for line in 0..lines.len() {
-            if !next_summon && lines[line].contains("is a") || lines[line].contains("is an") { // entity definition
-                let contents = lines[line].split(" ").collect::<Vec<&str>>();
+            let mut current_line = "";
 
-                // Entities' names MUST be unique
-                //if entities_list.contains(&contents[0].to_string()) {
-                //
-                //}
+            if let Some(index) = lines[line].find("//") {
+                current_line = &lines[line][..index].trim();
+            } else {
+                current_line = lines[line].trim();
+            }
+
+            if !next_summon && current_line.contains("is a") || current_line.contains("is an") { // entity definition
+                let contents = current_line.split(" ").collect::<Vec<&str>>();
 
                 for entity in &all_entities {
                     // collision. Entity with that name and type already exists.
@@ -54,6 +57,7 @@ pub fn generate_all(zombie_code: &String) {
 
                 if contents[contents.len() - 1] == "Zombie" {
                     entity_bounds = (line, bounds.pop().unwrap());
+                    all_entity_bounds.push(*&entity_bounds);
 
                     current_entity_info = (contents[contents.len() - 1], &contents[0]);
 
@@ -73,9 +77,9 @@ pub fn generate_all(zombie_code: &String) {
             if next_summon { // require "summon" on next line
                 next_summon = false;
 
-                if lines[line].to_lowercase() != "summon" {
+                if current_line.to_lowercase() != "summon" {
                     panic!("Expected \"summon\" after entity definition on line {}. \
-                \nHint: use \"summon\" on line {} instead of \"{}\"", line - 1, line, lines[line]);
+                \nHint: use \"summon\" on line {} instead of \"{}\"", line - 1, line, current_line);
                 }
 
                 if let Some(entity) = all_entities.get_mut(current_entity_info.1) {
@@ -83,45 +87,70 @@ pub fn generate_all(zombie_code: &String) {
                 }
             }
 
-            if lines[line].starts_with("animate") || lines[line].starts_with("read_about") {
-                let contents = lines[line].split(" ").collect::<Vec<&str>>();
+            if current_line.starts_with("animate") || current_line.starts_with("read_about") {
+                if line_is_within_entity_scope(line, &all_entity_bounds) {
+                        show_error(line, "Attempted top-level execution within entity/task bounds.")
+                }
+                let contents = current_line.split(" ").collect::<Vec<&str>>();
 
                 //TODO: DRY this check
                 if contents.len() > 2 {
-                    panic!("Animation expects only one argument.");
+                    show_error(line, "Animation expects only one argument.");
                 } else if contents.len() < 2 {
-                    panic!("Animation requires an Entity's name.");
+                    show_error(line, "Animation requires an Entity's name.");
                 }
                 if let Some(entity) = all_entities.get_mut(contents[1]) {
-                    if lines[line].starts_with("animate") {
+                    if current_line.starts_with("animate") {
                         entity.perform_tasks();
                         entity.toggle_active();
-                    } else if lines[line].starts_with("read_about") {
+                    } else if current_line.starts_with("read_about") {
                         entity.print_entity_data();
                     }
                 } else {
-                    panic!("No entity to with name \"{}\" was found.", contents[1]);
+                    show_error(line, &format!("No entity to with name \"{}\" was found.", contents[1]));
                 }
             }
 
-            if lines[line].starts_with("banish") {
-                let contents = lines[line].split(" ").collect::<Vec<&str>>();
+            if current_line.starts_with("banish") || current_line.starts_with("use") {
+                if line_is_within_entity_scope(line, &all_entity_bounds) {
+                        show_error(line, "Attempted top-level execution within entity/task bounds.")
+                }
+
+                let contents = current_line.split(" ").collect::<Vec<&str>>();
 
                 //TODO: DRY
                 if contents.len() > 2 {
-                    panic!("Animation expects only one argument.");
+                    show_error(line, "Banishing expects only one argument.");
                 } else if contents.len() < 2 {
-                    panic!("Animation requires an Entity's name.");
+                    show_error(line, "Banishing requires an Entity's name.");
                 }
 
-                if let Some(entity) = all_entities.get(contents[1]) {
+                if let Some(entity) = all_entities.get_mut(contents[1]) {
+                    if current_line.starts_with("use") {
+                        entity.perform_tasks();
+                    }
+
                     all_entities.remove(contents[1]);
                 } else {
-                    panic!("No entity to banish with name \"{}\" was found.", contents[1]);
+                    show_error(line, &format!("No entity to banish with name \"{}\" was found.", contents[1]));
                 }
             }
         }
     }
+}
+
+fn show_error(line: usize, text: &str) {
+    eprintln!("Error on line {}: {}", line, text);
+    std::process::exit(1);
+}
+
+fn line_is_within_entity_scope<'a>(line: usize, entity_bounds: &Vec<(usize, usize)>) -> bool {
+    for bounds in entity_bounds {
+        if line >= bounds.0 && line <= bounds.1 {
+            return true;
+        }
+    }
+    false
 }
 
 fn generate_tasks(range: &(usize, usize), text: &Vec<&str>) -> VecDeque<Task> {
@@ -155,14 +184,19 @@ fn scope_check(code: &String) -> Option<Vec<&str>> {
 
     for line in &lines {
         if line.contains("summon") || line.contains("task") {
-            if line.starts_with("say") || line.contains("\""){
+            if line.starts_with("say") ||
+                line.starts_with("//") ||
+                line.starts_with("use") ||
+                line.contains("\""){
                 continue;
             } else {
                 summons_and_tasks += 1;
             }
         }
         if line.contains("done") || line.contains("bind") {
-            if line.starts_with("say") || line.contains("\""){
+            if line.starts_with("say") ||
+                line.starts_with("//") ||
+                    line.contains("\""){
                 continue;
             } else {
                 animations_and_bounds += 1;

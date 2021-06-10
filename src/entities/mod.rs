@@ -16,6 +16,7 @@ pub trait Entity {
     fn perform_tasks(&mut self);
     fn set_tasks(&mut self, _: VecDeque<Task>);
     fn toggle_active(&mut self);
+    fn is_line_within_scope(&self, _: usize) -> bool;
 
     /*dev ops*/
 
