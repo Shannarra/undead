@@ -31,6 +31,14 @@ bind
 
 use Pete
 
+HelloWorld is a Zombie
+summon
+	task SayHello
+		say "Hello World! \n"
+	done
+bind
+animate HelloWorld
+
 // same as writing "use Josh"
 animate Josh
 banish Josh

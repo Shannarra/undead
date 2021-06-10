@@ -1,6 +1,9 @@
 HelloWorld is a Zombie
 summon
 	task SayHello
-		say "Hello World!"
-	animate
+	    say "Hello World! \n"
+	done
 bind
+
+use HelloWorld
+read_about HelloWorld
