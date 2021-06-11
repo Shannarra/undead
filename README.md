@@ -91,10 +91,33 @@ use HelloWorld
 ```
 
 Nothing changes visually, but if we decide to get the available 
-information about it by using the 'read_about' directive we'll 
+information about it by using the `read_about` directive we'll 
 get the following error:
 ```
 Hello World! 
 Error on line 9: No entity to with name "HelloWorld" was found.
 ```
 Meaning that the entity does no longer exist.
+
+### What are top-level commands?
+Undead, contrasting to Zombie, makes difference between different 
+commands upon their validation. This means that, using a command 
+in the wrong place __will__ lead to an error.  
+Example:
+```Test is a Zombie
+summon
+bind
+
+HelloWorld is a Zombie
+summon
+	task SayHello
+	    say "Hello World! \n"
+	    use test //this will produce an error
+	done
+bind
+```
+We will get the error `Error on line 9: Attempted top-level execution within entity/task bounds.`,
+meaning that the `use` keyword must NOT be used within secondary-levels (entity or task scopes).
+
+The top level commands in Undead are:
+`use`, `animate` and `banish`. More might follow later on.

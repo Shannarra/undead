@@ -1,9 +1,14 @@
+Test is a Zombie
+summon
+bind
+
 HelloWorld is a Zombie
 summon
 	task SayHello
 	    say "Hello World! \n"
+	    read_about Test
 	done
 bind
 
 use HelloWorld
-read_about HelloWorld
+//read_about HelloWorld
