@@ -10,5 +10,5 @@ summon
 	done
 bind
 
-use HelloWorld
+read_about HelloWorld
 //read_about HelloWorld

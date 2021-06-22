@@ -6,8 +6,6 @@ use crate::entities::{
 };
 use crate::error::{UndeadError, ErrorType};
 use std::collections::{VecDeque, HashMap};
-use std::borrow::BorrowMut;
-use std::fs::read_to_string;
 
 pub fn generate_all(ritual_text: &String) -> Result<HashMap<&str, Box<dyn Entity + '_>>, UndeadError> {
 
